@@ -55,8 +55,59 @@ async function showSlip(){
 }
 function downloadPdf(){if(!state.pdfUrl)return;const a=document.createElement("a");a.href=state.pdfUrl;a.download=state.pdfName;a.click();}
 function revokePdf(){if(state.pdfUrl)URL.revokeObjectURL(state.pdfUrl);state.pdfUrl="";$("viewPdfButton").disabled=true;$("downloadPdfButton").disabled=true;}
-async function loadAdmin(){try{const [e,s]=await Promise.all([api("adminListEmployees"),api("adminListSlips")]);state.employees=e.employees;state.slips=s.slips;renderEmployees();renderSlips();}catch(err){toast(err.message,true);}}
-function switchAdminTab(tab){document.querySelectorAll("[data-admin-tab]").forEach(b=>b.classList.toggle("active",b.dataset.adminTab===tab));$("employeesTab").classList.toggle("hidden",tab!=="employees");$("slipsTab").classList.toggle("hidden",tab!=="slips");}
+async async function loadAdmin() {
+  await loadEmployees();
+}
+
+async function loadEmployees() {
+  try {
+    const data = await api("adminListEmployees");
+
+    state.employees = data.employees;
+    renderEmployees();
+  } catch (err) {
+    toast(err.message, true);
+  }
+}
+
+async function loadSlips() {
+  try {
+    const data = await api("adminListSlips");
+
+    state.slips = data.slips;
+    renderSlips();
+  } catch (err) {
+    toast(err.message, true);
+  }
+}
+async function switchAdminTab(tab) {
+  document
+    .querySelectorAll("[data-admin-tab]")
+    .forEach(function (button) {
+      button.classList.toggle(
+        "active",
+        button.dataset.adminTab === tab
+      );
+    });
+
+  $("employeesTab").classList.toggle(
+    "hidden",
+    tab !== "employees"
+  );
+
+  $("slipsTab").classList.toggle(
+    "hidden",
+    tab !== "slips"
+  );
+
+  if (tab === "employees" && state.employees.length === 0) {
+    await loadEmployees();
+  }
+
+  if (tab === "slips" && state.slips.length === 0) {
+    await loadSlips();
+  }
+}
 function renderEmployees(){const q=$("employeeSearch").value.toLowerCase();const rows=state.employees.filter(e=>[e.nik,e.nopeg,e.name,e.project].join(" ").toLowerCase().includes(q));$("employeeTableBody").innerHTML=rows.map(e=>`<tr><td>${esc(e.nik)}</td><td>${esc(e.nopeg)}</td><td>${esc(e.name)}</td><td>${esc(e.project)}</td><td>${esc(e.role)}</td><td><button class="action-button" onclick="editEmployee('${escAttr(e.nik)}')">Edit</button><button class="action-button danger" onclick="deleteEmployee('${escAttr(e.nik)}')">Hapus</button></td></tr>`).join("")||emptyRow(6);$("employeeCount").textContent=`${rows.length} Data Karyawan`;}
 function renderSlips(){const q=$("slipSearch").value.toLowerCase();const rows=state.slips.filter(s=>[s.nik,s.name,s.fileName,s.month,s.year].join(" ").toLowerCase().includes(q));$("slipTableBody").innerHTML=rows.map(s=>`<tr><td>${esc(s.nik)}</td><td>${esc(s.name)}</td><td>${esc(MONTHS[s.month-1])} ${esc(s.year)}</td><td>${esc(s.fileName)}</td><td><button class="action-button" onclick="editSlip('${escAttr(s.id)}')">Edit</button><button class="action-button danger" onclick="deleteSlip('${escAttr(s.id)}')">Hapus</button></td></tr>`).join("")||emptyRow(5);$("slipCount").textContent=`${rows.length} Data Slip Gaji`;}
 function openEmployeeDialog(e=null){$("employeeDialogTitle").textContent=e?"Edit Karyawan":"Tambah Karyawan";$("employeeOriginalNik").value=e?.nik||"";$("employeeNik").value=e?.nik||"";$("employeeNopeg").value=e?.nopeg||"";$("employeeFullName").value=e?.name||"";$("employeeProjectInput").value=e?.project||"";$("employeeRole").value=e?.role||"EMPLOYEE";$("employeeActive").value=String(e?.active??true).toUpperCase();$("employeePassword").value="";$("employeeDialog").showModal();}
