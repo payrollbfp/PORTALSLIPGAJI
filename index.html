@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Portal Slip Gaji PT Bintang Fajar Persada" />
+  <title>Portal Slip Gaji | PT Bintang Fajar Persada</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <main id="loginView" class="login-page">
+    <div class="brand-swoop brand-swoop-top"></div>
+    <div class="brand-swoop brand-swoop-bottom"></div>
+    <section class="login-card" aria-labelledby="loginTitle">
+      <img src="assets/logo-bfp.png" alt="Logo PT Bintang Fajar Persada" class="login-logo" />
+      <h1 id="loginTitle">Portal Slip Gaji</h1>
+      <p>Silakan masuk untuk melihat slip gaji Anda</p>
+      <form id="loginForm" autocomplete="on">
+        <label for="nik">NIK</label>
+        <input id="nik" name="nik" inputmode="numeric" autocomplete="username" placeholder="Masukkan NIK" required />
+        <label for="password">Password</label>
+        <div class="password-wrap">
+          <input id="password" name="password" type="password" autocomplete="current-password" placeholder="Masukkan password" required />
+          <button id="togglePassword" class="icon-button" type="button" aria-label="Tampilkan password">◉</button>
+        </div>
+        <button id="loginButton" class="button button-primary button-block" type="submit">Masuk</button>
+      </form>
+      <p class="security-note">🔒 Data Anda dilindungi dan bersifat rahasia.</p>
+    </section>
+    <footer class="login-footer">© <span id="copyrightYear"></span> PT Bintang Fajar Persada · Developed by Laili</footer>
+  </main>
+
+  <div id="employeeApp" class="app-shell hidden">
+    <header class="topbar">
+      <img src="assets/logo-bfp.png" alt="Logo BFP" class="topbar-logo" />
+      <button class="button button-ghost logout-button" data-logout>↪ Logout</button>
+    </header>
+    <main class="employee-main">
+      <section class="welcome-card">
+        <div class="welcome-icon">♙</div>
+        <div><h1>Selamat Datang, <span id="employeeName"></span></h1><p>Project: <strong id="employeeProject"></strong></p></div>
+      </section>
+      <section class="panel slip-filter">
+        <div class="section-title"><span class="title-icon">▤</span><h2>Slip Gaji</h2></div>
+        <div class="filter-grid">
+          <div><label for="monthSelect">Bulan</label><select id="monthSelect"><option value="">Pilih bulan</option></select></div>
+          <div><label for="yearSelect">Tahun</label><select id="yearSelect"><option value="">Pilih tahun</option></select></div>
+          <button id="showSlipButton" class="button button-primary">Tampilkan Slip Gaji</button>
+        </div>
+      </section>
+      <section id="slipResult" class="panel slip-result">
+        <div id="emptySlip" class="empty-state"><div class="pdf-icon">PDF</div><p>Pilih bulan dan tahun untuk menampilkan slip gaji.</p></div>
+        <iframe id="pdfFrame" class="pdf-frame hidden" title="Pratinjau slip gaji"></iframe>
+        <div class="result-footer"><p>🔒 Slip gaji bersifat pribadi dan rahasia.</p><div><button id="viewPdfButton" class="button button-outline" disabled>◉ Lihat PDF</button><button id="downloadPdfButton" class="button button-primary" disabled>⇩ Unduh PDF</button></div></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="adminApp" class="app-shell hidden">
+    <header class="topbar"><img src="assets/logo-bfp.png" alt="Logo BFP" class="topbar-logo" /><div class="admin-account"><strong>Administrator</strong><button class="button button-ghost" data-logout>↪ Logout</button></div></header>
+    <div class="admin-layout">
+      <aside class="sidebar">
+        <button class="nav-item active" data-admin-tab="employees">♙ Data Karyawan</button>
+        <button class="nav-item" data-admin-tab="slips">▤ Data Slip Gaji</button>
+      </aside>
+      <main class="admin-main">
+        <section id="employeesTab" class="admin-tab">
+          <div class="page-heading"><div><h1>Data Karyawan</h1><p>Kelola identitas dan akses karyawan.</p></div><button id="addEmployeeButton" class="button button-primary">+ Tambah Karyawan</button></div>
+          <input id="employeeSearch" class="search-input" placeholder="Cari nama, NIK, Nopeg, atau Project" />
+          <div class="table-card"><div class="table-wrap"><table><thead><tr><th>NIK</th><th>Nopeg</th><th>Nama Karyawan</th><th>Project</th><th>Role</th><th>Aksi</th></tr></thead><tbody id="employeeTableBody"></tbody></table></div><p id="employeeCount" class="count-note"></p></div>
+        </section>
+        <section id="slipsTab" class="admin-tab hidden">
+          <div class="page-heading"><div><h1>Data Slip Gaji</h1><p>Hubungkan slip karyawan dengan file PDF private di Google Drive.</p></div><button id="addSlipButton" class="button button-primary">+ Tambah Slip</button></div>
+          <input id="slipSearch" class="search-input" placeholder="Cari NIK, nama file, bulan, atau tahun" />
+          <div class="table-card"><div class="table-wrap"><table><thead><tr><th>NIK</th><th>Nama</th><th>Periode</th><th>Nama File</th><th>Aksi</th></tr></thead><tbody id="slipTableBody"></tbody></table></div><p id="slipCount" class="count-note"></p></div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <dialog id="employeeDialog">
+    <form id="employeeForm" method="dialog" class="dialog-form">
+      <div class="dialog-heading"><h2 id="employeeDialogTitle">Tambah Karyawan</h2><button class="icon-button" value="cancel" type="button" data-close-dialog>×</button></div>
+      <input id="employeeOriginalNik" type="hidden" />
+      <div class="form-grid"><div><label for="employeeNik">NIK</label><input id="employeeNik" required /></div><div><label for="employeeNopeg">Nopeg</label><input id="employeeNopeg" required /></div></div>
+      <label for="employeeFullName">Nama Karyawan</label><input id="employeeFullName" required />
+      <label for="employeeProjectInput">Project</label><input id="employeeProjectInput" required />
+      <div class="form-grid"><div><label for="employeeRole">Role</label><select id="employeeRole"><option value="EMPLOYEE">Karyawan</option><option value="ADMIN">Administrator</option></select></div><div><label for="employeeActive">Status</label><select id="employeeActive"><option value="TRUE">Aktif</option><option value="FALSE">Nonaktif</option></select></div></div>
+      <label for="employeePassword">Password <small>(kosongkan saat edit jika tidak diubah)</small></label><input id="employeePassword" type="password" />
+      <div class="dialog-actions"><button class="button button-ghost" type="button" data-close-dialog>Batal</button><button class="button button-primary" type="submit">Simpan</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="slipDialog">
+    <form id="slipForm" method="dialog" class="dialog-form">
+      <div class="dialog-heading"><h2 id="slipDialogTitle">Tambah Slip Gaji</h2><button class="icon-button" type="button" data-close-dialog>×</button></div>
+      <input id="slipId" type="hidden" />
+      <label for="slipNik">NIK Karyawan</label><input id="slipNik" required />
+      <div class="form-grid"><div><label for="slipMonth">Bulan</label><select id="slipMonth" required></select></div><div><label for="slipYear">Tahun</label><input id="slipYear" type="number" min="2020" max="2100" required /></div></div>
+      <label for="driveFileId">Google Drive File ID atau tautan PDF</label><input id="driveFileId" required placeholder="Tempel File ID atau link Google Drive" />
+      <label for="slipFileName">Nama File</label><input id="slipFileName" required placeholder="Contoh: Slip Gaji Agustus 2026.pdf" />
+      <div class="dialog-actions"><button class="button button-ghost" type="button" data-close-dialog>Batal</button><button class="button button-primary" type="submit">Simpan</button></div>
+    </form>
+  </dialog>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
